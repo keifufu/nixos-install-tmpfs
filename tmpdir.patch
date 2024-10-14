@@ -1,0 +1,45 @@
+diff --git a/nixos-install.sh b/nixos-install.sh
+index 6098aac..aba5480 100644
+--- a/nixos-install.sh
++++ b/nixos-install.sh
+@@ -20,10 +20,14 @@ verbosity=()
+ attr=
+ buildFile=
+ buildingAttribute=1
++tmpdir=
+ 
+ while [ "$#" -gt 0 ]; do
+     i="$1"; shift 1
+     case "$i" in
++        --tmpdir)
++            tmpdir="$1"; shift 1
++            ;;
+         --max-jobs|-j|--cores|-I|--substituters)
+             j="$1"; shift 1
+             extraBuildFlags+=("$i" "$j")
+@@ -106,6 +110,11 @@ while [ "$#" -gt 0 ]; do
+     esac
+ done
+ 
++if ! test -e "$tmpdir"; then
++    tmpdir="$(mktemp -d -p "$mountPoint")"
++    trap 'rm -rf $tmpdir' EXIT
++fi
++
+ if ! test -e "$mountPoint"; then
+     echo "mount point $mountPoint doesn't exist"
+     exit 1
+@@ -173,12 +182,7 @@ if [[ ! -z $buildingAttribute && -e $buildFile && -z $system ]]; then
+     exit 1
+ fi
+ 
+-# A place to drop temporary stuff.
+-tmpdir="$(mktemp -d -p "$mountPoint")"
+-trap 'rm -rf $tmpdir' EXIT
+-
+-# store temporary files on target filesystem by default
+-export TMPDIR=${TMPDIR:-$tmpdir}
++export TMPDIR=$tmpdir
+ 
+ sub="auto?trusted=1"
+ 
