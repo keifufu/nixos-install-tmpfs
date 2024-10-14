@@ -16,7 +16,7 @@
         patch = ./tmpdir.patch;
       in
         pkgs.stdenv.mkDerivation rec {
-          pname = "nixos-install";
+          pname = "nixos-install-tmpfs";
           version = "1.0.0";
           src = pkgs.substituteAll {
             src = "${nixosInstallSrc}/pkgs/by-name/ni/nixos-install/nixos-install.sh";
